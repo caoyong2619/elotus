@@ -37,3 +37,20 @@ func (a *Auth) Register() gin.HandlerFunc {
 		c.JSON(http.StatusOK, Success(CodeSuccess))
 	}
 }
+
+func (a *Auth) Login() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		var data form.Login
+		if err := context.BindJSON(&data); err != nil {
+			context.JSON(http.StatusBadRequest, Error(CodeSuccess, err.Error()))
+			return
+		}
+
+		token, err := a.authService.Login(data.Username, data.Password)
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, Error(CodeError, err.Error()))
+		}
+
+		context.JSON(http.StatusOK, Success(gin.H{"token": token}))
+	}
+}

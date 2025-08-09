@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/caoyong2619/elotus/internal/database"
+	"github.com/caoyong2619/elotus/internal/services"
 )
 
 func TestAuthServiceRegister(t *testing.T) {
@@ -35,5 +36,16 @@ func TestAuthServiceLogin(t *testing.T) {
 
 	if token == `` {
 		t.Fatal(fmt.Errorf("token is empty"))
+	}
+
+	// check the token
+	parsed, err := authService.ParseToken(token)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	claims := parsed.Claims.(*services.ElotusClaims)
+	if claims.Username != testUsername {
+		t.Fatal(fmt.Errorf("username not match"))
 	}
 }

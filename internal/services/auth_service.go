@@ -56,19 +56,21 @@ func (s *AuthService) Login(username, password string) (string, error) {
 	}
 
 	exp := time.Now().Add(10 * time.Minute)
-	t := jwt.NewWithClaims(jwt.SigningMethodHS256, &ElotusClaims{
+	claims := &ElotusClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(10 * time.Minute)),
+			ExpiresAt: jwt.NewNumericDate(exp),
 		},
 		ID:       user.Id,
 		Username: user.Username,
-	})
+	}
+	t := s.GenerateToken(claims)
 
 	signedToken, err := t.SignedString(s.secret)
 	if err != nil {
 		return ``, err
 	}
 
+	// record the token, but it seems to have no effect in this example :)
 	_, err = s.engine.InsertOne(&database.AuthToken{
 		Token:     signedToken,
 		UserId:    user.Id,
@@ -79,4 +81,15 @@ func (s *AuthService) Login(username, password string) (string, error) {
 	}
 
 	return signedToken, nil
+}
+
+func (s *AuthService) GenerateToken(claims jwt.Claims) *jwt.Token {
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+}
+
+func (s *AuthService) ParseToken(token string) (*jwt.Token, error) {
+	claims := &ElotusClaims{}
+	return jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return s.secret, nil
+	})
 }

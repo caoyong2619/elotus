@@ -12,8 +12,10 @@ import (
 	"github.com/caoyong2619/elotus/internal/database"
 	"github.com/caoyong2619/elotus/internal/database/migrations"
 	"github.com/caoyong2619/elotus/internal/route"
+	"github.com/caoyong2619/elotus/internal/route/middlewares"
 	"github.com/caoyong2619/elotus/internal/services"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"xorm.io/xorm/migrate"
 )
 
@@ -62,10 +64,13 @@ func bootstrap() error {
 func serve() {
 	e := gin.Default()
 
-	authService := services.NewAuthService(database.Engine)
+	secret := viper.GetString("secret")
+	authService := services.NewAuthService(database.Engine, []byte(secret))
 	auth := route.NewAuth(authService)
 
 	e.POST(`/auth/register`, auth.Register())
+	e.POST(`/auth/login`, auth.Login())
+	e.POST(`/upload`, middlewares.JWTAuthMiddleware(authService), route.Upload())
 
 	err := e.Run(":8080")
 	if err != nil {
@@ -110,8 +115,4 @@ func runMigrate(args []string) {
 
 		log.Println("rollback success")
 	}
-}
-
-func rollbackLatest(m *migrate.Migrate) error {
-	return m.RollbackLast()
 }
