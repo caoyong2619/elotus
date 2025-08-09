@@ -1,0 +1,6 @@
+application:
+  addr: ":8080"
+
+# only sqlite
+database:
+  dsn: "./test.sqlite3"
