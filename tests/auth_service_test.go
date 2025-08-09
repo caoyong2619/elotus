@@ -5,13 +5,10 @@ import (
 	"testing"
 
 	"github.com/caoyong2619/elotus/internal/database"
-	"github.com/caoyong2619/elotus/internal/services"
 )
 
 func TestAuthServiceRegister(t *testing.T) {
-	svc := services.NewAuthService(database.Engine)
-
-	err := svc.Register(`test`, `123456`)
+	err := authService.Register(testUsername, testPassword)
 
 	if err != nil {
 		t.Fatal(err)
@@ -26,5 +23,17 @@ func TestAuthServiceRegister(t *testing.T) {
 
 	if count != 1 {
 		t.Fatal(fmt.Errorf("user not registered"))
+	}
+}
+
+func TestAuthServiceLogin(t *testing.T) {
+	token, err := authService.Login(testUsername, testPassword)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if token == `` {
+		t.Fatal(fmt.Errorf("token is empty"))
 	}
 }

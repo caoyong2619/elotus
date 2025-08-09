@@ -8,8 +8,15 @@ import (
 	"github.com/caoyong2619/elotus/internal/config"
 	"github.com/caoyong2619/elotus/internal/database"
 	"github.com/caoyong2619/elotus/internal/database/migrations"
+	"github.com/caoyong2619/elotus/internal/services"
 	"github.com/spf13/viper"
 	"xorm.io/xorm/migrate"
+)
+
+var (
+	testUsername = `test`
+	testPassword = `123456`
+	authService  *services.AuthService
 )
 
 func testError(err error) {
@@ -42,5 +49,11 @@ func TestMain(m *testing.M) {
 		testError(err)
 	}
 
+	initServices()
+
 	os.Exit(m.Run())
+}
+
+func initServices() {
+	authService = services.NewAuthService(database.Engine, []byte(viper.GetString(`application.secret`)))
 }

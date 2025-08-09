@@ -1,5 +1,6 @@
 application:
   addr: ":8080"
+  secret: "secret"
 
 # only sqlite
 database:
