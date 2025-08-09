@@ -8,6 +8,7 @@ import (
 	"github.com/caoyong2619/elotus/internal/config"
 	"github.com/caoyong2619/elotus/internal/database"
 	"github.com/caoyong2619/elotus/internal/database/migrations"
+	"github.com/spf13/viper"
 	"xorm.io/xorm/migrate"
 )
 
@@ -22,6 +23,9 @@ func TestMain(m *testing.M) {
 	if err := config.Init(`./config.yaml`); err != nil {
 		testError(err)
 	}
+
+	// remove db file if exists
+	_ = os.Remove(viper.GetString(`database.dsn`))
 
 	if err := database.Init(); err != nil {
 		testError(err)
