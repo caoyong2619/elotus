@@ -1,7 +1,7 @@
 application:
   addr: ":8080"
-  secret: "secret"
+  secret: "test"
 
 # only sqlite
 database:
-  dsn: "./elotus.sqlite3"
+  dsn: "./test.sqlite3"
